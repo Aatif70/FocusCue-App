@@ -10,18 +10,22 @@ struct SplashScreenView: View {
         if isActive {
             ContentView()
         } else {
-            VStack {
+            ZStack {
+                Color(hex: "FFDDD2")
+                    .ignoresSafeArea()
+                
                 VStack {
                     Image(systemName: "rectangle.and.pencil.and.ellipsis")
-                        .font(.system(size: 50))
-                        .foregroundStyle(.blue.gradient)
+                        .font(.system(size: 80))
+                        .foregroundColor(Color(hex: "006D77"))
                         .symbolRenderingMode(.hierarchical)
                         .symbolEffect(.variableColor.cumulative.dimInactiveLayers.nonReversing)
-//                        .rotationEffect(.degrees(rotation))
+                        .rotationEffect(.degrees(rotation))
                         .animation(.easeInOut(duration: 2).repeatForever(autoreverses: false), value: rotation)
                     
                     Text("Tasks")
                         .font(.system(size: 40, weight: .bold))
+                        .foregroundColor(Color(hex: "006D77"))
                 }
                 .scaleEffect(size)
                 .opacity(opacity)
@@ -45,6 +49,35 @@ struct SplashScreenView: View {
         }
     }
 }
+
+// Add this extension to use hex colors
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3: // RGB (12-bit)
+            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: // RGB (24-bit)
+            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: // ARGB (32-bit)
+            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            (a, r, g, b) = (1, 1, 1, 0)
+        }
+
+        self.init(
+            .sRGB,
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue:  Double(b) / 255,
+            opacity: Double(a) / 255
+        )
+    }
+}
+
 
 #Preview {
     SplashScreenView()

@@ -1,11 +1,3 @@
-//
-//  ContentView.swift
-//  ToDo list
-//
-//  Created by Aatif Ahmed on 9/25/24.
-//
-
-
 import SwiftUI
 
 struct ContentView: View {
@@ -14,26 +6,55 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            List {
-                Section(header: Text("Upcoming Tasks")) {
-                    ForEach($tasks.filter { !$0.isCompleted.wrappedValue }, id: \.id) { $task in
-                        TaskRow(task: $task)
-                    }
-                    .onDelete(perform: deleteTask)
-                }
+            ZStack {
+                Color(.systemPink)
+                    .ignoresSafeArea()
                 
-                Section(header: Text("Completed Tasks")) {
-                    ForEach($tasks.filter { $0.isCompleted.wrappedValue }, id: \.id) { $task in
-                        TaskRow(task: $task)
+                VStack {
+                    Text("Task List")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(Color(.white))        // To do list FONT COLOR
+                       
+                        
+                        
+                    
+                    List {
+                        
+                        // Upcoming task
+                        Section(header: Text("Upcoming Tasks")
+                            .foregroundColor(Color(hex: "006D77"))
+                            .padding([.top, .bottom, .trailing], 10.0)) {
+                            ForEach($tasks.filter { !$0.isCompleted.wrappedValue }, id: \.id) { $task in
+                                TaskRow(task: $task)
+                            }
+                            .onDelete(perform: deleteTask)
+                        }
+                        
+                        // Completed task
+                        Section(header: Text("Completed Tasks")
+                            .foregroundColor(Color(hex: "006D77"))
+                            .padding([.top, .bottom, .trailing], 10.0)) {
+                            ForEach($tasks.filter { $0.isCompleted.wrappedValue }, id: \.id) { $task in
+                                TaskRow(task: $task)
+                            }
+                            .onDelete(perform: deleteTask)
+                        }
                     }
-                    .onDelete(perform: deleteTask)
+                    .listStyle(InsetGroupedListStyle())
+                    Spacer()
+                    
+                    
                 }
             }
-            .navigationTitle("Task List")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingAddTask = true }) {
                         Image(systemName: "plus")
+                            .foregroundColor(Color.white)
+                            .padding()
+                            
                     }
                 }
             }
@@ -54,18 +75,19 @@ struct TaskRow: View {
     var body: some View {
         HStack {
             Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                .foregroundColor(task.isCompleted ? .green : .gray)
+                .foregroundColor(task.isCompleted ? .gray : Color(hex: "006D77"))
                 .onTapGesture {
                     task.isCompleted.toggle()
                 }
             
             VStack(alignment: .leading) {
                 Text(task.title)
+                    .foregroundColor(.black) // Keep task title black
                     .strikethrough(task.isCompleted)
                 if let dueDate = task.dueDate {
                     Text(dueDate, style: .date)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color(hex: "006D77"))
                 }
             }
             
@@ -75,6 +97,7 @@ struct TaskRow: View {
                 .fill(task.priority.color)
                 .frame(width: 10, height: 10)
         }
+        .listRowBackground(Color(hex: "edf6f9"))
     }
 }
 
