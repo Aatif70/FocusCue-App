@@ -11,13 +11,18 @@ struct SplashScreenView: View {
             ContentView()
         } else {
             ZStack {
-                Color(hex: "FFDDD2")
+                LinearGradient(gradient: Gradient(colors: [
+                                Color(hex: "D0B8A8"),  // Custom hex color
+                                Color(hex: "F8EDE3")   // Another custom hex color
+                              ]),
+                               startPoint: .top,
+                               endPoint: .bottom)
                     .ignoresSafeArea()
                 
                 VStack {
                     Image(systemName: "rectangle.and.pencil.and.ellipsis")
                         .font(.system(size: 80))
-                        .foregroundColor(Color(hex: "006D77"))
+                        .foregroundColor(Color(hex: "4A4947"))
                         .symbolRenderingMode(.hierarchical)
                         .symbolEffect(.variableColor.cumulative.dimInactiveLayers.nonReversing)
                         .rotationEffect(.degrees(rotation))
@@ -25,22 +30,22 @@ struct SplashScreenView: View {
                     
                     Text("Tasks")
                         .font(.system(size: 40, weight: .bold))
-                        .foregroundColor(Color(hex: "006D77"))
+                        .foregroundColor(Color(hex: "C5705D"))
                 }
                 .scaleEffect(size)
                 .opacity(opacity)
                 .onAppear {
-                    withAnimation(.easeIn(duration: 1.2)) {
-                        self.size = 0.9
-                        self.opacity = 1.0
+                    withAnimation(.easeIn(duration: 0.5)) {
+                        self.size = 0.8
+                        self.opacity = 1
                     }
-                    withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
-                        self.rotation = 360
+                    withAnimation(.linear(duration: 0.5).repeatForever(autoreverses: false)) {
+                        self.rotation = 0
                     }
                 }
             }
             .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     withAnimation {
                         self.isActive = true
                     }
@@ -50,7 +55,6 @@ struct SplashScreenView: View {
     }
 }
 
-// Add this extension to use hex colors
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)

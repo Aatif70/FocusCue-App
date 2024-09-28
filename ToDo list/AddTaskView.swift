@@ -29,6 +29,8 @@ struct AddTaskView: View {
                 }
             }
             .navigationTitle("Add Task")
+            .foregroundColor(Color(hex: "4A4947"))
+            
             .navigationBarItems(
                 leading: Button("Cancel") {
                     presentationMode.wrappedValue.dismiss()
@@ -38,8 +40,10 @@ struct AddTaskView: View {
                     tasks.append(newTask)
                     presentationMode.wrappedValue.dismiss()
                 }
+                    .foregroundColor(Color(hex: "4A4947"))
                 .disabled(title.isEmpty)
             )
         }
     }
 }
+
