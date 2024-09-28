@@ -7,6 +7,7 @@
 
 
 import SwiftUI
+import UserNotifications
 
 struct Task: Identifiable {
     let id = UUID()
@@ -15,7 +16,29 @@ struct Task: Identifiable {
     var dueDate: Date?
     var priority: Priority
     var isCompleted: Bool = false
+    
+    func scheduleNotification() {
+        guard let dueDate = dueDate else { return }
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Task Due: \(title)"
+        content.body = description
+        content.sound = UNNotificationSound.default
+        
+        let triggerDate = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: dueDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
+        
+        let request = UNNotificationRequest(identifier: id.uuidString, content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error scheduling notification: \(error)")
+            }
+        }
+    }
 }
+
+
 
 enum Priority: String, CaseIterable {
     case low, medium, high

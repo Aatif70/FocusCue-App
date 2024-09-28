@@ -97,7 +97,7 @@ struct TaskRow: View {
             
             VStack(alignment: .leading) {
                 Text(task.title)
-                    .foregroundColor(.black) 
+                    .foregroundColor(.black)
                     .strikethrough(task.isCompleted)
                 if let dueDate = task.dueDate {
                     Text(dueDate, style: .date)

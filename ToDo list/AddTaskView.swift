@@ -5,7 +5,6 @@
 //  Created by Aatif Ahmed on 9/25/24.
 //
 
-
 import SwiftUI
 
 struct AddTaskView: View {
@@ -38,12 +37,12 @@ struct AddTaskView: View {
                 trailing: Button("Save") {
                     let newTask = Task(title: title, description: description, dueDate: dueDate, priority: priority)
                     tasks.append(newTask)
+                    newTask.scheduleNotification()
                     presentationMode.wrappedValue.dismiss()
                 }
-                    .foregroundColor(Color(hex: "4A4947"))
+                .foregroundColor(Color(hex: "4A4947"))
                 .disabled(title.isEmpty)
             )
         }
     }
 }
-
