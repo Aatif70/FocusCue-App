@@ -3,68 +3,64 @@ import SwiftUI
 struct ContentView: View {
     @State private var tasks: [Task] = []
     @State private var showingAddTask = false
+    @State private var showingCalendar = false
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         NavigationView {
-            
             ZStack {
-                Color( hex: "D8D2C2")
-                .ignoresSafeArea()
+                (colorScheme == .dark ? Color(hex: "561C24") : Color(hex: "FFE7E7"))
+                    .ignoresSafeArea()
                 
-                
-                
-                                VStack {
-                                    
-                                    // MARK: Task List
-                                    Text("Task List")
-                                        .font(.title)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(Color(hex: "4A4947"))        // To do list FONT COLOR
-                                    
-                                    // MARK: List
-                                    List {
-                                        
-                
-                
-                                        // Upcoming task
-                                        Section(header: Text("Upcoming Tasks")
-                                            .foregroundColor(Color(hex: "B17457"))
-                                            .padding([.top, .bottom, .trailing], 10.0)) {
-                                            ForEach($tasks.filter { !$0.isCompleted.wrappedValue }, id: \.id) { $task in
-                                                TaskRow(task: $task)
-                                            }
-                                            .onDelete(perform: deleteTask)
-                                        }
-                
-                                        // Completed task
-                                        Section(header: Text("Completed Tasks")
-                                            .foregroundColor(Color(hex: "B17457"))
-                                            .padding([.top, .bottom, .trailing], 10.0)) {
-                                            ForEach($tasks.filter { $0.isCompleted.wrappedValue }, id: \.id) { $task in
-                                                TaskRow(task: $task)
-                                            }
-                                            .onDelete(perform: deleteTask)
-                                        }
-                                    }
-                                    .cornerRadius(25.0)
-                
-                                    .listStyle(InsetGroupedListStyle())
-                                    
-                
-                                }
-                                .padding(.all, 23.0)
-                                
-                
+                VStack {
+                    Text("Task List")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(colorScheme == .dark ? .white : Color(hex: "FF6969"))
+                    
+                    List {
+                        Section(header: Text("Upcoming Tasks")) {
+                            ForEach($tasks.filter { !$0.isCompleted.wrappedValue }, id: \.id) { $task in
+                                TaskRow(task: $task)
+                            }
+                            .onDelete(perform: deleteUncompletedTask)
+                        }
+                        
+                        Section(header: Text("Completed Tasks")) {
+                            ForEach($tasks.filter { $0.isCompleted.wrappedValue }, id: \.id) { $task in
+                                TaskRow(task: $task)
+                            }
+                            .onDelete(perform: deleteCompletedTask)
+                        }
+                    }
+                    .listStyle(InsetGroupedListStyle())
+                    .background(colorScheme == .dark ? Color.red : Color(hex: "F8EDE3"))
+                    .cornerRadius(25.0)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        showingCalendar = true
+                    }) {
+                        HStack {
+                            Image(systemName: "calendar")
+                            Text("View Calendar")
+                        }
+                        .padding()
+                        .background(colorScheme == .dark ? Color(hex: "C80036") : Color(hex: "FF6969"))
+                        .foregroundColor(.white)
+                        .cornerRadius(24)
+                    }
+                    .padding(.top)
+                }
+                .padding(.all, 20)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingAddTask = true }) {
-                        
                         Image(systemName: "plus")
-                            .foregroundColor(Color (hex: "4A4947"))
-                            
+                            .foregroundColor(colorScheme == .dark ? .white : Color(hex: "4A4947"))
                     }
                     .padding(.trailing, 2.0)
                 }
@@ -72,20 +68,36 @@ struct ContentView: View {
             .sheet(isPresented: $showingAddTask) {
                 AddTaskView(tasks: $tasks)
             }
+            .sheet(isPresented: $showingCalendar) {
+                NavigationView {
+                    CalendarView(tasks: $tasks)
+                }
+            }
         }
-        
-        
-        
-        
     }
     
-    func deleteTask(at offsets: IndexSet) {
-        tasks.remove(atOffsets: offsets)
+    func deleteUncompletedTask(at offsets: IndexSet) {
+        let uncompletedTasks = tasks.filter { !$0.isCompleted }
+        for index in offsets {
+            if let taskIndex = tasks.firstIndex(where: { $0.id == uncompletedTasks[index].id }) {
+                tasks.remove(at: taskIndex)
+            }
+        }
+    }
+    
+    func deleteCompletedTask(at offsets: IndexSet) {
+        let completedTasks = tasks.filter { $0.isCompleted }
+        for index in offsets {
+            if let taskIndex = tasks.firstIndex(where: { $0.id == completedTasks[index].id }) {
+                tasks.remove(at: taskIndex)
+            }
+        }
     }
 }
 
 struct TaskRow: View {
     @Binding var task: Task
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         HStack {
@@ -97,12 +109,12 @@ struct TaskRow: View {
             
             VStack(alignment: .leading) {
                 Text(task.title)
-                    .foregroundColor(.black)
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
                     .strikethrough(task.isCompleted)
                 if let dueDate = task.dueDate {
                     Text(dueDate, style: .date)
                         .font(.caption)
-                        .foregroundColor(Color(hex: "795757"))
+                        .foregroundColor(colorScheme == .dark ? .gray : Color(hex: "795757"))
                 }
             }
             
@@ -112,10 +124,9 @@ struct TaskRow: View {
                 .fill(task.priority.color)
                 .frame(width: 10, height: 10)
         }
-        .listRowBackground(Color(hex: "F8EDE3"))
+        .padding(.vertical, 8)
     }
 }
-
 
 #Preview {
     ContentView()

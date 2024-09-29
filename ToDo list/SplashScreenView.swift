@@ -5,32 +5,34 @@ struct SplashScreenView: View {
     @State private var size = 0.8
     @State private var opacity = 0.5
     @State private var rotation: Double = 0
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         if isActive {
             ContentView()
         } else {
             ZStack {
-                LinearGradient(gradient: Gradient(colors: [
-                                Color(hex: "D0B8A8"),  // Custom hex color
-                                Color(hex: "F8EDE3")   // Another custom hex color
-                              ]),
-                               startPoint: .top,
-                               endPoint: .bottom)
+                // Use Color directly without conditional
+                (colorScheme == .dark ? Color.black : Color(hex: "F8EDE3"))
                     .ignoresSafeArea()
                 
                 VStack {
                     Image(systemName: "rectangle.and.pencil.and.ellipsis")
                         .font(.system(size: 80))
-                        .foregroundColor(Color(hex: "4A4947"))
+                        .foregroundColor(colorScheme == .dark ? .white : Color(hex: "4A4947"))
                         .symbolRenderingMode(.hierarchical)
                         .symbolEffect(.variableColor.cumulative.dimInactiveLayers.nonReversing)
                         .rotationEffect(.degrees(rotation))
-                        .animation(.easeInOut(duration: 2).repeatForever(autoreverses: false), value: rotation)
+                        .animation(.easeInOut(duration: 1).repeatForever(autoreverses: false), value: rotation)
                     
                     Text("Tasks")
-                        .font(.system(size: 40, weight: .bold))
-                        .foregroundColor(Color(hex: "C5705D"))
+                        
+                        .foregroundColor(colorScheme == .dark ? .pink : Color(.orange))
+                        .font(.system(size: 50, weight: .light, design: .serif))
+                            .italic()
+                            .bold()
+                           
+                        
                 }
                 .scaleEffect(size)
                 .opacity(opacity)
@@ -54,6 +56,7 @@ struct SplashScreenView: View {
         }
     }
 }
+
 
 extension Color {
     init(hex: String) {

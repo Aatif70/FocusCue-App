@@ -12,25 +12,43 @@ struct AddTaskView: View {
     @State private var title = ""
     @State private var description = ""
     @State private var dueDate = Date()
-    @State private var priority = Priority.medium
+    @State private var priority = Priority.medium     // keeping priority as Medium by default
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.colorScheme) var colorScheme
+    
+    
     
     var body: some View {
         NavigationView {
+            
+            
             Form {
+                
                 TextField("Title", text: $title)
+                    .foregroundColor(Color(.gray))
+                
                 TextField("Description", text: $description)
+                    .foregroundColor(Color(.gray))
+                
                 DatePicker("Due Date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
+                    .foregroundColor(Color(.gray))
+                
                 Picker("Priority", selection: $priority) {
                     ForEach(Priority.allCases, id: \.self) { priority in
                         Text(priority.rawValue.capitalized)
                     }
                 }
+                .foregroundColor(Color(.gray))
             }
+           
             .navigationTitle("Add Task")
-            .foregroundColor(Color(hex: "4A4947"))
             
+            
+            
+            
+            // MARK: CANCEL AND SAVE BUTTONS
             .navigationBarItems(
+                
                 leading: Button("Cancel") {
                     presentationMode.wrappedValue.dismiss()
                 },
@@ -40,9 +58,17 @@ struct AddTaskView: View {
                     newTask.scheduleNotification()
                     presentationMode.wrappedValue.dismiss()
                 }
-                .foregroundColor(Color(hex: "4A4947"))
-                .disabled(title.isEmpty)
+                    .foregroundColor(Color(.pink))
+                    .disabled(title.isEmpty)
             )
         }
+        //   .accentColor(colorScheme == .dark ? .white : Color(hex: "4A4947"))
+        
+        .accentColor(colorScheme == .dark ? .pink : Color.pink)
+        
+        }
     }
+
+#Preview {
+    AddTaskView(tasks: .constant([]))
 }

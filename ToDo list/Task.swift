@@ -11,11 +11,11 @@ import UserNotifications
 
 struct Task: Identifiable {
     let id = UUID()
-    var title: String
-    var description: String
-    var dueDate: Date?
-    var priority: Priority
-    var isCompleted: Bool = false
+        var title: String
+        var description: String
+        var dueDate: Date?
+        var priority: Priority
+        var isCompleted: Bool = false
     
     func scheduleNotification() {
         guard let dueDate = dueDate else { return }
@@ -36,7 +36,13 @@ struct Task: Identifiable {
             }
         }
     }
+    
+    static func == (lhs: Task, rhs: Task) -> Bool {
+            lhs.id == rhs.id
+        }
+    
 }
+
 
 
 
@@ -51,3 +57,5 @@ enum Priority: String, CaseIterable {
         }
     }
 }
+
+
