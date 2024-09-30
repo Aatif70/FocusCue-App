@@ -2,9 +2,9 @@ import SwiftUI
 
 struct CalendarView: View {
     @Binding var tasks: [Task]
-    @State private var selectedDate: Date = Date()
-    private let calendar = Calendar.current
-    @Environment(\.colorScheme) var colorScheme
+        @State private var selectedDate: Date = Date()
+        private let calendar = Calendar.current
+        @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack(spacing: 0) {
@@ -17,21 +17,23 @@ struct CalendarView: View {
     }
     
     private func tasksForSelectedMonth() -> [Task] {
-        let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: selectedDate))!
-        let monthEnd = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: monthStart)!
-        
-        return tasks.filter { task in
-            guard let dueDate = task.dueDate else { return false }
-            return dueDate >= monthStart && dueDate <= monthEnd
-        }.sorted { $0.dueDate! < $1.dueDate! }
-    }
+           guard let monthInterval = calendar.dateInterval(of: .month, for: selectedDate) else {
+               return []
+           }
+           
+           return tasks.filter { task in
+               guard let dueDate = task.dueDate else { return false }
+               return dueDate >= monthInterval.start && dueDate < monthInterval.end
+           }.sorted { $0.dueDate! < $1.dueDate! }
+       }
+   }
     
     private func monthYearString(for date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM yyyy"
         return formatter.string(from: date)
     }
-}
+
 
 
 
@@ -136,9 +138,9 @@ struct CalendarHeaderView: View {
 
 struct CalendarGridView: View {
     @Binding var selectedDate: Date
-    let tasks: [Task]
-    private let calendar = Calendar.current
-    private let daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+        let tasks: [Task]
+        private let calendar = Calendar.current
+        private let daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
@@ -191,13 +193,16 @@ struct CalendarGridView: View {
     }
     
     private func tasksForDate(_ date: Date) -> [Task] {
-        let startOfDay = calendar.startOfDay(for: date)
-        return tasks.filter { task in
-            guard let taskDate = task.dueDate else { return false }
-            return calendar.isDate(startOfDay, inSameDayAs: taskDate)
-        }
-    }
-}
+           let startOfDay = calendar.startOfDay(for: date)
+           let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+           
+           return tasks.filter { task in
+               guard let taskDate = task.dueDate else { return false }
+               let taskStartOfDay = calendar.startOfDay(for: taskDate)
+               return taskStartOfDay >= startOfDay && taskStartOfDay < endOfDay
+           }
+       }
+   }
 
 
 

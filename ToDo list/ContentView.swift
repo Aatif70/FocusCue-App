@@ -34,7 +34,7 @@ struct ContentView: View {
                         }
                     }
                     .listStyle(InsetGroupedListStyle())
-                    .background(colorScheme == .dark ? Color.red : Color(hex: "F8EDE3"))
+                    .background(colorScheme == .dark ? Color(hex: "692323") : Color(hex: "F8EDE3"))
                     .cornerRadius(25.0)
                     
                     Spacer()

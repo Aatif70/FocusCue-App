@@ -24,14 +24,17 @@ struct SplashScreenView: View {
                         .symbolEffect(.variableColor.cumulative.dimInactiveLayers.nonReversing)
                         .rotationEffect(.degrees(rotation))
                         .animation(.easeInOut(duration: 1).repeatForever(autoreverses: false), value: rotation)
-                    
-                    Text("Tasks")
-                        
-                        .foregroundColor(colorScheme == .dark ? .pink : Color(.orange))
-                        .font(.system(size: 50, weight: .light, design: .serif))
-                            .italic()
-                            .bold()
-                           
+                   
+                    HStack(spacing: 0) {
+                        Text("Focus")
+                            .font(.system(size: 50, weight: .medium, design: .default))
+                            .foregroundColor(Color(hex: "4A4947"))
+
+                        Text("Cue")
+                            .font(.system(size: 50, weight: .medium, design: .default))
+                            .foregroundColor(.pink)
+                    }
+
                         
                 }
                 .scaleEffect(size)
