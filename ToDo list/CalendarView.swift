@@ -239,7 +239,7 @@ struct DayView: View {
                     .frame(width: 3, height: 3)
             }
         }
-        .frame(height: 40)
+//        .frame(height: 40)
     }
 }
 
@@ -261,14 +261,13 @@ struct TaskListView: View {
             }
         }
         .listStyle(InsetGroupedListStyle())
-        .background(colorScheme == .dark ? Color.black : Color(hex: "F8EDE3"))
     }
 }
 
 
 
-
-
 #Preview {
-    CalendarView(tasks: .constant([]))
+  CalendarView(tasks: .constant([]))
 }
+
+

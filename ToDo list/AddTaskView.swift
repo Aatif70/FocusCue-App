@@ -29,6 +29,7 @@ struct AddTaskView: View {
                 
                 TextField("Description", text: $description)
                     .foregroundColor(Color(.gray))
+               
                 
                 DatePicker("Due Date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
                     .foregroundColor(Color(.gray))
@@ -69,6 +70,6 @@ struct AddTaskView: View {
         }
     }
 
-#Preview {
-    AddTaskView(tasks: .constant([]))
-}
+//#Preview {
+//    AddTaskView(tasks: .constant([]))
+//}
