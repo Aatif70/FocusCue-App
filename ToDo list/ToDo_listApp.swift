@@ -5,6 +5,8 @@
 //  Created by Aatif Ahmed on 9/25/24.
 //
 
+// A simple todo list app
+
 
 import SwiftUI
 import UserNotifications
@@ -20,6 +22,9 @@ struct ToDo_listApp: App {
             SplashScreenView()
         }
     }
+    
+    
+    
     
     func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in

@@ -9,13 +9,14 @@
 import SwiftUI
 import UserNotifications
 
-struct Task: Identifiable {
+struct Task: Identifiable, Codable {
     let id = UUID()
-        var title: String
-        var description: String
-        var dueDate: Date?
-        var priority: Priority
-        var isCompleted: Bool = false
+    var title: String
+    var description: String
+    var dueDate: Date?
+    var priority: Priority
+    var isCompleted: Bool = false
+    var eventIdentifier: String? // Add this property to store the event identifier
     
     func scheduleNotification() {
         guard let dueDate = dueDate else { return }
@@ -46,7 +47,7 @@ struct Task: Identifiable {
 
 
 
-enum Priority: String, CaseIterable {
+enum Priority: String, CaseIterable, Codable {
     case low, medium, high
     
     var color: Color {

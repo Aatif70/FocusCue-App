@@ -6,70 +6,94 @@
 //
 
 import SwiftUI
+import EventKit
 
 struct AddTaskView: View {
-    @Binding var tasks: [Task]
-    @State private var title = ""
-    @State private var description = ""
-    @State private var dueDate = Date()
-    @State private var priority = Priority.medium     // keeping priority as Medium by default
     @Environment(\.presentationMode) var presentationMode
-    @Environment(\.colorScheme) var colorScheme
-    
-    
+    @Binding var tasks: [Task]
+    @State private var title: String = ""
+    @State private var description: String = ""
+    @State private var dueDate: Date = Date()
+    @State private var dueTime: Date = Date()
+    @State private var priority: Priority = .medium
     
     var body: some View {
         NavigationView {
-            
-            
             Form {
-                
                 TextField("Title", text: $title)
-                    .foregroundColor(Color(.gray))
-                
                 TextField("Description", text: $description)
-                    .foregroundColor(Color(.gray))
-               
-                
-                DatePicker("Due Date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
-                    .foregroundColor(Color(.gray))
-                
+                DatePicker("Due Date", selection: $dueDate, displayedComponents: .date)
+                DatePicker("Due Time", selection: $dueTime, displayedComponents: .hourAndMinute)
                 Picker("Priority", selection: $priority) {
                     ForEach(Priority.allCases, id: \.self) { priority in
                         Text(priority.rawValue.capitalized)
                     }
                 }
-                .foregroundColor(Color(.gray))
             }
-           
-            .navigationTitle("Add Task")
-            
-            
-            
-            
-            // MARK: CANCEL AND SAVE BUTTONS
+            .navigationBarTitle("Add Task")
             .navigationBarItems(
-                
                 leading: Button("Cancel") {
                     presentationMode.wrappedValue.dismiss()
                 },
-                trailing: Button("Save") {
-                    let newTask = Task(title: title, description: description, dueDate: dueDate, priority: priority)
-                    tasks.append(newTask)
-                    newTask.scheduleNotification()
+                trailing: Button("Add") {
+                    let combinedDate = Calendar.current.date(bySettingHour: Calendar.current.component(.hour, from: dueTime),
+                                                             minute: Calendar.current.component(.minute, from: dueTime),
+                                                             second: 0,
+                                                             of: dueDate) ?? dueDate
+                    
+                    var newTask = Task(title: title, description: description, dueDate: combinedDate, priority: priority)
+                    
+                    addTaskToCalendar(task: newTask) { success, eventIdentifier, error in
+                        if success, let eventIdentifier = eventIdentifier {
+                            newTask.eventIdentifier = eventIdentifier
+                            tasks.append(newTask)
+                            saveTasks(tasks)
+                            print("Task added to calendar")
+                        } else {
+                            print("Failed to add task to calendar: \(String(describing: error))")
+                        }
+                    }
+                    
                     presentationMode.wrappedValue.dismiss()
                 }
-                    .foregroundColor(Color(.pink))
-                    .disabled(title.isEmpty)
+                .disabled(title.isEmpty)
             )
         }
-        //   .accentColor(colorScheme == .dark ? .white : Color(hex: "4A4947"))
+    }
+    
+    // Function to add task to calendar
+    func addTaskToCalendar(task: Task, completion: @escaping (Bool, String?, Error?) -> Void) {
+        let eventStore = EKEventStore()
         
-        .accentColor(colorScheme == .dark ? .pink : Color.pink)
-        
+        eventStore.requestAccess(to: .event) { granted, error in
+            guard granted else {
+                completion(false, nil, error)
+                return
+            }
+            
+            let event = EKEvent(eventStore: eventStore)
+            event.title = task.title
+            event.notes = task.description
+            event.startDate = task.dueDate ?? Date()
+            event.endDate = (task.dueDate ?? Date()).addingTimeInterval(3600) // 1 hour duration
+            event.calendar = eventStore.defaultCalendarForNewEvents
+            
+            do {
+                try eventStore.save(event, span: .thisEvent)
+                completion(true, event.eventIdentifier, nil)
+            } catch let error {
+                completion(false, nil, error)
+            }
         }
     }
+    
+    func saveTasks(_ tasks: [Task]) {
+        if let encoded = try? JSONEncoder().encode(tasks) {
+            UserDefaults.standard.set(encoded, forKey: "tasks")
+        }
+    }
+}
 
-//#Preview {
-//    AddTaskView(tasks: .constant([]))
-//}
+#Preview {
+    AddTaskView(tasks: .constant([]))
+}
