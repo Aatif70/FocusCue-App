@@ -1,8 +1,8 @@
-# ToDo List App
+# FocusCue App
 
 ## Overview
 
-The ToDo List App is a simple task management application built using SwiftUI and EventKit. It allows users to create, manage, and delete tasks while synchronizing with the iCloud Calendar. The app provides a clean and minimalistic interface, supporting both light and dark modes.
+The FocusCue List App is a simple task management application built using SwiftUI and EventKit. It allows users to create, manage, and delete tasks while synchronizing with the iCloud Calendar. The app provides a clean and minimalistic interface, supporting both light and dark modes.
 
 ## Features
 
@@ -21,7 +21,7 @@ The ToDo List App is a simple task management application built using SwiftUI an
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/todo-list-app.git
+   git clone https://github.com/Aatif70/todo-list-app.git
    cd todo-list-app
    ```
 
@@ -66,7 +66,4 @@ Contributions are welcome! If you have suggestions for improvements or new featu
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
 
-- Thanks to the SwiftUI and EventKit documentation for guidance on implementing features.
-- Special thanks to the open-source community for their contributions and support.
