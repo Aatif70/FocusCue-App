@@ -24,9 +24,6 @@ struct ToDo_listApp: App {
         }
     }
     
-    
-    
-    
     func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
             if granted {

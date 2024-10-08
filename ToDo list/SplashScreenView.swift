@@ -12,7 +12,6 @@ struct SplashScreenView: View {
             ContentView()
         } else {
             ZStack {
-                // Use Color directly without conditional
                 (colorScheme == .dark ? Color.black : Color(hex: "F8EDE3"))
                     .ignoresSafeArea()
                 
@@ -20,8 +19,6 @@ struct SplashScreenView: View {
                     Image(systemName: "rectangle.and.pencil.and.ellipsis")
                         .font(.system(size: 80))
                         .foregroundColor(colorScheme == .dark ? .white : Color(hex: "4A4947"))
-                        .symbolRenderingMode(.hierarchical)
-                        .symbolEffect(.variableColor.cumulative.dimInactiveLayers.nonReversing)
                         .rotationEffect(.degrees(rotation))
                         .animation(.easeInOut(duration: 1).repeatForever(autoreverses: false), value: rotation)
                    
@@ -34,8 +31,6 @@ struct SplashScreenView: View {
                             .font(.system(size: 50, weight: .medium, design: .default))
                             .foregroundColor(.pink)
                     }
-
-                        
                 }
                 .scaleEffect(size)
                 .opacity(opacity)
@@ -59,7 +54,6 @@ struct SplashScreenView: View {
         }
     }
 }
-
 
 extension Color {
     init(hex: String) {
@@ -87,7 +81,6 @@ extension Color {
         )
     }
 }
-
 
 #Preview {
     SplashScreenView()

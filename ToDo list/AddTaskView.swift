@@ -16,6 +16,7 @@ struct AddTaskView: View {
     @State private var dueDate: Date = Date()
     @State private var dueTime: Date = Date()
     @State private var priority: Priority = .medium
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         NavigationView {
@@ -43,11 +44,12 @@ struct AddTaskView: View {
                     
                     var newTask = Task(title: title, description: description, dueDate: combinedDate, priority: priority)
                     
+                    print("Adding task: \(newTask.title) with due date: \(String(describing: newTask.dueDate))")
+                    
                     addTaskToCalendar(task: newTask) { success, eventIdentifier, error in
                         if success, let eventIdentifier = eventIdentifier {
                             newTask.eventIdentifier = eventIdentifier
                             tasks.append(newTask)
-                            saveTasks(tasks)
                             print("Task added to calendar")
                             
                             // Schedule notification for the new task
@@ -61,6 +63,7 @@ struct AddTaskView: View {
                 }
                 .disabled(title.isEmpty)
             )
+            .background(colorScheme == .dark ? Color.darkBackground : Color.lightBackground)
         }
     }
     
@@ -68,9 +71,16 @@ struct AddTaskView: View {
     func addTaskToCalendar(task: Task, completion: @escaping (Bool, String?, Error?) -> Void) {
         let eventStore = EKEventStore()
         
-        eventStore.requestFullAccessToEvents { granted, error in
-            guard granted else {
+        eventStore.requestAccess(to: .event) { granted, error in
+            if let error = error {
+                print("Error requesting calendar access: \(error.localizedDescription)")
                 completion(false, nil, error)
+                return
+            }
+            
+            guard granted else {
+                print("Calendar access not granted")
+                completion(false, nil, nil)
                 return
             }
             
@@ -79,12 +89,22 @@ struct AddTaskView: View {
             event.notes = task.description
             event.startDate = task.dueDate ?? Date()
             event.endDate = (task.dueDate ?? Date()).addingTimeInterval(3600) // 1 hour duration
-            event.calendar = eventStore.defaultCalendarForNewEvents
+            
+            // Set the calendar to the default calendar for new events
+            if let defaultCalendar = eventStore.defaultCalendarForNewEvents {
+                event.calendar = defaultCalendar
+            } else {
+                print("No default calendar found.")
+                completion(false, nil, nil)
+                return
+            }
             
             do {
                 try eventStore.save(event, span: .thisEvent)
+                print("Event saved: \(event.title) at \(event.startDate) with identifier: \(event.eventIdentifier)")
                 completion(true, event.eventIdentifier, nil)
             } catch let error {
+                print("Failed to save event: \(error.localizedDescription)")
                 completion(false, nil, error)
             }
         }
@@ -124,6 +144,35 @@ struct AddTaskView: View {
         let category = UNNotificationCategory(identifier: "TASK_CATEGORY", actions: [completeAction], intentIdentifiers: [], options: [])
         
         UNUserNotificationCenter.current().setNotificationCategories([category])
+    }
+    
+    func deleteEventFromCalendar(_ eventIdentifier: String) {
+        let eventStore = EKEventStore()
+        print("Attempting to delete event with identifier: \(eventIdentifier)")
+        
+        eventStore.requestAccess(to: .event) { granted, error in
+            if let error = error {
+                print("Error requesting access: \(error.localizedDescription)")
+            }
+            
+            guard granted else {
+                print("Access to calendar not granted")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                if let event = eventStore.event(withIdentifier: eventIdentifier) {
+                    do {
+                        try eventStore.remove(event, span: .thisEvent)
+                        print("Event successfully deleted from calendar")
+                    } catch let error {
+                        print("Failed to delete event: \(error.localizedDescription)")
+                    }
+                } else {
+                    print("Event not found with identifier: \(eventIdentifier). It may have been deleted already.")
+                }
+            }
+        }
     }
 }
 

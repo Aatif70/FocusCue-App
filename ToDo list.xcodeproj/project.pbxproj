@@ -273,6 +273,7 @@
 				DEVELOPMENT_TEAM = FU9LN4UMVZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ToDo-list-Info.plist";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "We need access to your calendar to add tasks.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -309,6 +310,7 @@
 				DEVELOPMENT_TEAM = FU9LN4UMVZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ToDo-list-Info.plist";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "We need access to your calendar to add tasks.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
