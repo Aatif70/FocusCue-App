@@ -49,6 +49,9 @@ struct AddTaskView: View {
                             tasks.append(newTask)
                             saveTasks(tasks)
                             print("Task added to calendar")
+                            
+                            // Schedule notification for the new task
+                            scheduleNotification(for: newTask)
                         } else {
                             print("Failed to add task to calendar: \(String(describing: error))")
                         }
@@ -65,7 +68,7 @@ struct AddTaskView: View {
     func addTaskToCalendar(task: Task, completion: @escaping (Bool, String?, Error?) -> Void) {
         let eventStore = EKEventStore()
         
-        eventStore.requestAccess(to: .event) { granted, error in
+        eventStore.requestFullAccessToEvents { granted, error in
             guard granted else {
                 completion(false, nil, error)
                 return
@@ -91,6 +94,36 @@ struct AddTaskView: View {
         if let encoded = try? JSONEncoder().encode(tasks) {
             UserDefaults.standard.set(encoded, forKey: "tasks")
         }
+    }
+    
+    func scheduleNotification(for task: Task) {
+        guard let dueDate = task.dueDate else { return }
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Task Due: \(task.title)"
+        content.body = task.description
+        content.sound = UNNotificationSound.default
+        content.categoryIdentifier = "TASK_CATEGORY"
+
+        let triggerDate = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: dueDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
+
+        let request = UNNotificationRequest(identifier: task.id.uuidString, content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error scheduling notification: \(error)")
+            } else {
+                print("Notification scheduled for task: \(task.title)")
+            }
+        }
+    }
+    
+    func setupNotificationCategories() {
+        let completeAction = UNNotificationAction(identifier: "COMPLETE_ACTION", title: "Complete", options: [.foreground])
+        let category = UNNotificationCategory(identifier: "TASK_CATEGORY", actions: [completeAction], intentIdentifiers: [], options: [])
+        
+        UNUserNotificationCenter.current().setNotificationCategories([category])
     }
 }
 

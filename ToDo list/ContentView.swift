@@ -119,15 +119,28 @@ struct ContentView: View {
         let eventStore = EKEventStore()
         print("Attempting to delete event with identifier: \(eventIdentifier)")
         
-        if let event = eventStore.event(withIdentifier: eventIdentifier) {
-            do {
-                try eventStore.remove(event, span: .thisEvent)
-                print("Event successfully deleted from calendar")
-            } catch let error {
-                print("Failed to delete event: \(error.localizedDescription)")
+        eventStore.requestFullAccessToEvents { granted, error in
+            if let error = error {
+                print("Error requesting access: \(error.localizedDescription)")
             }
-        } else {
-            print("Event not found with identifier: \(eventIdentifier)")
+            
+            guard granted else {
+                print("Access to calendar not granted")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                if let event = eventStore.event(withIdentifier: eventIdentifier) {
+                    do {
+                        try eventStore.remove(event, span: .thisEvent)
+                        print("Event successfully deleted from calendar")
+                    } catch let error {
+                        print("Failed to delete event: \(error.localizedDescription)")
+                    }
+                } else {
+                    print("Event not found with identifier: \(eventIdentifier)")
+                }
+            }
         }
     }
     

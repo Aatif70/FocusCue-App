@@ -15,6 +15,7 @@ import UserNotifications
 struct ToDo_listApp: App {
     init() {
         requestNotificationPermission()
+        setupNotificationCategories() 
     }
     
     var body: some Scene {
@@ -34,5 +35,12 @@ struct ToDo_listApp: App {
                 print("Error requesting notification permission: \(error)")
             }
         }
+    }
+    
+    func setupNotificationCategories() {
+        let completeAction = UNNotificationAction(identifier: "COMPLETE_ACTION", title: "Complete", options: [.foreground])
+        let category = UNNotificationCategory(identifier: "TASK_CATEGORY", actions: [completeAction], intentIdentifiers: [], options: [])
+        
+        UNUserNotificationCenter.current().setNotificationCategories([category])
     }
 }
