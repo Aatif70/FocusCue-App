@@ -1,5 +1,8 @@
 # FocusCue App
 
+![Uploading Dark.png…]()
+
+
 ## Overview
 
 The FocusCue List App is a simple task management application for iOS built using SwiftUI and EventKit. It allows users to create, manage, and delete tasks while synchronizing with the iCloud Calendar. The app provides a clean and minimalistic interface, supporting both light and dark modes.
