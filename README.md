@@ -1,6 +1,7 @@
 # FocusCue App
 
-![Uploading Dark.png…]()
+![Dark Mode](Dark.png)
+
 
 
 ## Overview
